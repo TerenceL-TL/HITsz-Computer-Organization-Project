@@ -1,6 +1,5 @@
 .data
-	str1:   .string "1qab9a0bcabcds13"
-    str2:   .string "bcds"
+	next: .string "\n"
 
 .macro push %a
 	addi	sp, sp, -4
@@ -41,7 +40,8 @@
 
 .text
 MAIN:
-	lui s0, 0x10010 # origin address
+	lui s8, 0x10010 
+	addi s0, s8, 2# origin address
 	addi s1, s0, 64 # pattern address
 	input s2, 5
 	inputstr s0, 63
@@ -61,14 +61,15 @@ MAIN:
 	pop a3
 	pop a2
 	pop a1 # retrive
-	addi s4, a0, 0 # save to s4
+	# addi s4, a0, 0 # save to s4
 	pop a0
-	print s4, 1
+	# print s4, 1
 	jal zero, END
 find_substr: # a1 as str, a2 as pattern, a3 as len1, a4 as len2
 	push s0
 	push s1
 	push s2 # save saved registers by callee
+	ori t4, zero , 0
 	addi s0, a1, 0
 	addi s1, a2, 0
 	sub  t6, a3, a4
@@ -93,9 +94,14 @@ loop:
 	jal zero, loop
 found:
 	sub a0, s0, a1
-	jal zero, end
+	print a0, 1
+	print s8, 4
+	ori t4, zero, 1
+	jal zero, itering
 failed:
 	ori a0, zero, -1 # a0 as return
+	bne t4, zero, end
+	print a0, 1
 end:
 	pop s2
 	pop s1
