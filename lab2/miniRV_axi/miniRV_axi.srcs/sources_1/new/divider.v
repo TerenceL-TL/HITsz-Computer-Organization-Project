@@ -83,9 +83,13 @@ always @(posedge clk or negedge rst) begin
         r <= 32'b0;
         z <= 32'b0;
     end 
-    else begin
+    else if (cnt == 32'd32) begin 
         r <= {x_sign,temp_r[60:30]};
         z <= {sign, temp_z};
+    end
+    else begin
+        r <= r;
+        z <= z;
     end
 end
 
@@ -116,7 +120,8 @@ always @(posedge clk or negedge rst) begin // main
                 temp_z <= temp_z;
             end
         end
-        else if (cnt == 32'd32) begin end
+        else if (cnt == 32'd32) begin 
+        end
         else begin
             if(temp_r[61] == 1'b0) begin
                 temp_r <= (temp_r << 1'b1) + {y_abs_inv, 30'b0};

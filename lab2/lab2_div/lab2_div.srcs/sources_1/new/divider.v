@@ -1,13 +1,12 @@
 `timescale 1ns / 1ps
 
-// This is a silly divider
 module divider (
     input  wire       clk,
     input  wire       rst,
     input  wire [7:0] x,
     input  wire [7:0] y,
     input  wire       start,
-    output wire [7:0] z,
+    output reg [7:0] z,
     output reg  [7:0] r,
     output reg        busy
 );
@@ -23,7 +22,6 @@ reg sign;
 reg [7:0] cnt;
 
 assign y_abs_inv = ~y_abs + 1'b1;
-assign z = {sign, temp_z};
 
 always @(posedge clk or negedge rst) begin // cnt
     if (rst == 1'b1) begin
@@ -83,9 +81,15 @@ end
 always @(posedge clk or negedge rst) begin
     if (rst == 1'b1) begin 
         r <= 8'b0;
+        z <= 8'b0;
     end 
-    else begin
+    else if (cnt == 8'd8) begin 
         r <= {x_sign,temp_r[12:6]};
+        z <= {sign, temp_z};
+    end
+    else begin
+        r <= r;
+        z <= z;
     end
 end
 
@@ -116,7 +120,10 @@ always @(posedge clk or negedge rst) begin // main
                 temp_z <= temp_z;
             end
         end
-        else if (cnt == 8'd8) begin end
+        else if (cnt == 8'd8) begin 
+            r <= {x_sign,temp_r[12:6]};
+            z <= {sign, temp_z};
+        end
         else begin
             if(temp_r[13] == 1'b0) begin
                 temp_r <= (temp_r << 1'b1) + {y_abs_inv, 6'b0};
